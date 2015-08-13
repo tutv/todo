@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $.ajax({
-        url: "api/get.php",
+        url: "api/view/get.php",
         method: "GET",
         dataType: "json",
         success: function (list) {
@@ -8,8 +8,11 @@ $(document).ready(function () {
             for (var i=0; i<list.length; i++) {
                 var task = list[i];
                 console.log(task);
-                addTodoHTML(task.id, task.content);
+                addTodoHTML(task.id, task.content, task.status);
             }
+        },
+        error: function () {
+            alert("Something went wrong!");
         }
     });
 
@@ -30,9 +33,41 @@ $(document).ready(function () {
 	});
 
 
-	//Check list task
+	//Check complete task
 	$("#todo-list").on("click", "li .check", function () {
 		var liTask = $(this).parents("li");
+        var id = liTask.attr('data-id');
+        var label = liTask.find('label');
+        var content = label.text();
+        var status = 0;
+        if (liTask.hasClass('complete')) {
+            console.log("Incomplete!");
+
+        } else {
+            console.log("Complete!");
+            status = 1;
+        }
+
+        var dataUpdate = {id: id, content: content, status: status};
+        $.ajax({
+            url: "api/view/update.php",
+            method: "GET",
+            dataType: "text",
+            data: dataUpdate,
+            success: function (data) {
+                if (data == "1") {
+                    alert("Update success!");
+                } else {
+                    alert("Update failed!");
+                }
+            },
+            error: function () {
+                alert("Something went wrong!");
+            }
+
+        });
+
+
 		liTask.toggleClass("complete");
 
 		//Remove check box all
@@ -62,7 +97,7 @@ $(document).ready(function () {
 				alert("Please fill in the content!");
 			} else {
                 $.ajax({
-                    url: "api/add.php",
+                    url: "api/view/add.php",
                     method: "GET",
                     data: {content: todo},
                     dataType: "json",
@@ -80,7 +115,7 @@ $(document).ready(function () {
 
                     },
                     error: function () {
-
+                        alert("Something went wrong!");
                     }
                 });
 			}
@@ -89,8 +124,12 @@ $(document).ready(function () {
 
 });
 
-function addTodoHTML(id, content) {
-    var taskHTML = "<li data-id='" + id + "'>"
+function addTodoHTML(id, content, status) {
+    var addClass = "class='complete'";
+    if (status == "0" || status == 0) {
+        addClass = "";
+    }
+    var taskHTML = "<li data-id='" + id + "' " + addClass +  " >"
         + "<div class='view'>"
         + "<div class='toogle'>"
         + "<div class='check'><i class='fa fa-check'></i></div>"

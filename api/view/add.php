@@ -1,7 +1,7 @@
 <?php
-include "config.php";
-include "echoJson.php";
-include "model.php";
+include '../config/config.php';
+include 'echoJson.php';
+include '../model/Todo.php';
 
 $content = $_GET['content'];
 
