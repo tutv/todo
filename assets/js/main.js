@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    // Get list task
     $.ajax({
         url: "api/view/get.php",
         method: "GET",
@@ -16,63 +17,30 @@ $(document).ready(function () {
         }
     });
 
+    //Toggle check all
 	$("#toggle-all").on("click", ".check", function () {
 		$(this).toggleClass("check");
 		$(this).toggleClass("uncheck");
 
+        checkCompleteAll(0);
+        showAllTask();
 		uncheckAll();
-		console.log("Uncecked!");
 	});
 
 	$("#toggle-all").on("click", ".uncheck", function () {
 		$(this).toggleClass("check");
 		$(this).toggleClass("uncheck");
 
+        checkCompleteAll(1);
+        showAllTask();
 		checkAll();
-		console.log("Checked!");
 	});
 
 
-	//Check complete task
+	//Check complete/incomplete task
 	$("#todo-list").on("click", "li .check", function () {
 		var liTask = $(this).parents("li");
-        var id = liTask.attr('data-id');
-        var label = liTask.find('label');
-        var content = label.text();
-        var status = 0;
-        if (liTask.hasClass('complete')) {
-            console.log("Incomplete!");
-
-        } else {
-            console.log("Complete!");
-            status = 1;
-        }
-
-        var dataUpdate = {id: id, content: content, status: status};
-        $.ajax({
-            url: "api/view/update.php",
-            method: "GET",
-            dataType: "text",
-            data: dataUpdate,
-            success: function (data) {
-                if (data == "1") {
-                    alert("Update success!");
-                } else {
-                    alert("Update failed!");
-                }
-            },
-            error: function () {
-                alert("Something went wrong!");
-            }
-
-        });
-
-
-		liTask.toggleClass("complete");
-
-		//Remove check box all
-		$("#toggle-all .check").addClass("uncheck");
-		$("#toggle-all .check").removeClass("check");
+        toggleCompleteTask(liTask);
 	});
 
 	//Hover li -> appear button delete
@@ -105,7 +73,7 @@ $(document).ready(function () {
                         console.log(json);
                         if (json.result) {
                             var task = json.todo;
-                            addTodoHTML(task.id, task.content);
+                            addTodoHTML(task.id, task.content, 0);
 
                             newTodo.val("");
                             newTodo.focus();
@@ -122,7 +90,81 @@ $(document).ready(function () {
 		}
 	});
 
+    //Show filter task
+    $("#filters li").on('click', function (e) {
+        e.preventDefault();
+
+        var li = $(this);
+        $("#filters li").removeClass('active');
+        li.addClass('active');
+        var filter = li.attr('data-filter');
+
+        if (filter == 'all') {
+            showAllTask();
+        } else if (filter == 'active') {
+            showActiveTask();
+        } else {
+            showCompleteTask();
+        }
+    });
+
 });
+
+function checkCompleteAll(action) {
+    $.ajax({
+        url: "api/view/checkCompleteAll.php",
+        method: "GET",
+        dataType: "text",
+        data: {action: action},
+        success: function (data) {
+            if (data == '1') {
+                console.log("Check/Uncheck complete all success!");
+            } else {
+                console.log("Check/Uncheck complete all failed!");
+            }
+        },
+        error: function () {
+            alert("Something went wrong!");
+        }
+    });
+}
+
+function toggleCompleteTask(liTask) {
+    var id = liTask.attr('data-id');
+    var label = liTask.find('label');
+    var content = label.text();
+
+    var status = 0;
+    if (liTask.hasClass('complete')) {
+        console.log("Incomplete!");
+
+    } else {
+        console.log("Complete!");
+        status = 1;
+    }
+
+    var dataUpdate = {id: id, content: content, status: status};
+    $.ajax({
+        url: "api/view/updateTask.php",
+        method: "GET",
+        dataType: "text",
+        data: dataUpdate,
+        success: function (data) {
+            if (data == "1") {
+                console.log("Update success!");
+            } else {
+                alert("Update failed!");
+            }
+        },
+        error: function () {
+            alert("Something went wrong!");
+        }
+
+    });
+
+    liTask.toggleClass("complete");
+    updateFooter();
+}
 
 function addTodoHTML(id, content, status) {
     var addClass = "class='complete'";
@@ -148,18 +190,76 @@ function addTodoHTML(id, content, status) {
 
 function checkAll() {
 	$("#todo-list li").addClass("complete");
+    updateFooter();
 }
 
 function uncheckAll() {
 	$("#todo-list li").removeClass("complete");
+    updateFooter();
+}
+
+function isCompleteAll() {
+    var listTask = $("#todo-list li");
+    listTask.each(function () {
+        if (!$(this).hasClass('complete')) {
+            return false;
+        }
+    });
+
+    return true;
 }
 
 function updateFooter() {
-    var countTask = $("#todo-list li").length;
+    var listTask = $("#todo-list li");
+    var countTask = listTask.length;
     if (countTask == 0) {
         $("#footer").addClass("hidden");
     } else {
         $("#footer").removeClass("hidden");
     }
 
+    var countIncomplete = 0;
+    listTask.each(function () {
+       if (!$(this).hasClass('complete')) {
+           countIncomplete++;
+       }
+    });
+
+    if (countIncomplete == 0) {
+        var toggleAll = $("#toggle-all > div");
+        toggleAll.addClass("check");
+        toggleAll.removeClass("uncheck");
+    } else {
+        var toggleAll = $("#toggle-all > div");
+        toggleAll.addClass("uncheck");
+        toggleAll.removeClass("check");
+    }
+
+    $("#todo-count strong").text(countIncomplete);
+}
+
+function showAllTask() {
+    $("#todo-list li").show();
+}
+
+function showActiveTask() {
+    var listTask = $("#todo-list li");
+    listTask.each(function () {
+        if (!$(this).hasClass('complete')) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
+}
+
+function showCompleteTask() {
+    var listTask = $("#todo-list li");
+    listTask.each(function () {
+        if ($(this).hasClass('complete')) {
+            $(this).show();
+        } else {
+            $(this).hide();
+        }
+    });
 }

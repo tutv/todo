@@ -35,13 +35,13 @@
     <footer id="footer" class="hidden">
         <span id="todo-count" class=""><strong>1</strong> item left</span>
         <ul id="filters">
-            <li>
+            <li class="active" data-filter="all">
                 <a class="selected" href="#">All</a>
             </li>
-            <li class="active">
+            <li data-filter="active">
                 <a href="#">Active</a>
             </li>
-            <li>
+            <li data-filter="complete">
                 <a href="#">Completed</a>
             </li>
         </ul>

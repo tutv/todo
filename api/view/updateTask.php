@@ -16,7 +16,7 @@ if (isset($_GET['id']) && isset($_GET['content']) && isset($_GET['status'])) {
     $status = $_GET['status'];
     $todo = new Todo($conn);
 
-    if ($todo->update($id, $content, $status)) {
+    if ($todo->updateTask($id, $content, $status)) {
         echo '1';
     }
     else {

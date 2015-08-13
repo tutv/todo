@@ -5,4 +5,4 @@ include '../model/Todo.php';
 
 $todo = new Todo($conn);
 
-print_r($todo->get(90));
+$todo->checkCompleteAll();

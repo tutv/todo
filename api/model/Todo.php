@@ -20,7 +20,7 @@ class Todo {
      * @return true/false
      */
 
-    function update($id, $content = null, $status = -1) {
+    function updateTask($id, $content = null, $status = -1) {
         if (!$this->idAvaiable($id)) {
             return false;
         }
@@ -52,6 +52,18 @@ class Todo {
         }
 
         return false;
+    }
+
+    function checkCompleteAll($status = 0) {
+        $listTask = $this->getAll();
+        foreach ($listTask as $task) {
+            $id = $task['id'];
+            if (!$this->updateTask($id, null, $status)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /*
