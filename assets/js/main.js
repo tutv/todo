@@ -1,7 +1,9 @@
+var base_apiURL = "api/view/";
+
 $(document).ready(function () {
     // Get list task
     $.ajax({
-        url: "api/view/get.php",
+        url: base_apiURL + "getTasks.php",
         method: "GET",
         dataType: "json",
         success: function (list) {
@@ -65,7 +67,7 @@ $(document).ready(function () {
 				alert("Please fill in the content!");
 			} else {
                 $.ajax({
-                    url: "api/view/add.php",
+                    url: base_apiURL + "addTask.php",
                     method: "GET",
                     data: {content: todo},
                     dataType: "json",
@@ -108,11 +110,64 @@ $(document).ready(function () {
         }
     });
 
+    $("#todo-list").on('click', ".destroy", function () {
+        console.log("Checked!");
+        var liTask = $(this).parents("li");
+        var id = liTask.attr('data-id');
+        $.ajax({
+            url: base_apiURL + "deleteTask.php",
+            method: "GET",
+            dataType: "text",
+            data: {id: id},
+            success: function (data) {
+                if (data == "1") {
+                    console.log("Delete task success!");
+                    liTask.remove();
+                } else {
+                    alert("Delete task failed!");
+                }
+            },
+            error: function () {
+                alert("Something went wrong!");
+            }
+        });
+    });
+
+    $("#clear-completed").on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: base_apiURL + "deleteTask.php",
+            method: "GET",
+            dataType: "text",
+            data: {id: 'completed'},
+            success: function (data) {
+                if (data == "1") {
+                    console.log("Delete completed task success!");
+                    delelteCompletedTask();
+                } else {
+                    alert("Delete completed task failed!");
+                }
+            },
+            error: function () {
+                alert("Something went wrong!");
+            }
+        });
+    });
+
 });
+
+function delelteCompletedTask() {
+    $("#todo-list li").each(function () {
+        if ($(this).hasClass('complete')) {
+            $(this).remove();
+        }
+    });
+    updateFooter();
+}
 
 function checkCompleteAll(action) {
     $.ajax({
-        url: "api/view/checkCompleteAll.php",
+        url: base_apiURL + "checkCompleteAll.php",
         method: "GET",
         dataType: "text",
         data: {action: action},
@@ -145,7 +200,7 @@ function toggleCompleteTask(liTask) {
 
     var dataUpdate = {id: id, content: content, status: status};
     $.ajax({
-        url: "api/view/updateTask.php",
+        url: base_apiURL + "updateTask.php",
         method: "GET",
         dataType: "text",
         data: dataUpdate,
@@ -212,8 +267,17 @@ function isCompleteAll() {
 function updateFooter() {
     var listTask = $("#todo-list li");
     var countTask = listTask.length;
+    var toggleAll = $("#toggle-all > div");
     if (countTask == 0) {
         $("#footer").addClass("hidden");
+        console.log("There is no task!");
+
+        // Fix bus <-----
+
+        console.log(toggleAll);
+        toggleAll.removeClass('check');
+        toggleAll.addClass('uncheck');
+
     } else {
         $("#footer").removeClass("hidden");
     }
@@ -225,12 +289,10 @@ function updateFooter() {
        }
     });
 
-    if (countIncomplete == 0) {
-        var toggleAll = $("#toggle-all > div");
+    if (countIncomplete == 0 && countTask != 0) {
         toggleAll.addClass("check");
         toggleAll.removeClass("uncheck");
     } else {
-        var toggleAll = $("#toggle-all > div");
         toggleAll.addClass("uncheck");
         toggleAll.removeClass("check");
     }
@@ -260,6 +322,22 @@ function showCompleteTask() {
             $(this).show();
         } else {
             $(this).hide();
+        }
+    });
+}
+
+function notify() {
+    var n = noty({
+        text: 'NOTY - a jquery notification library!',
+        type: 'info',
+        theme: 'defaultTheme',
+        lyout: 'topLeft',
+        maxVisible: 5,
+        animation: {
+            open: 'animated bounceInLeft', // Animate.css class names
+            close: 'animated bounceOutLeft', // Animate.css class names
+            easing: 'swing', // unavailable - no need
+            speed: 500 // unavailable - no need
         }
     });
 }

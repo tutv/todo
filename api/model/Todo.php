@@ -11,8 +11,26 @@ class Todo {
      * DESTROY
      */
 
-    function delete() {
+    function deleteTask($id) {
+        $id = $this->protecting_injection($id);
 
+        $sql = "DELETE FROM task WHERE id='$id'";
+
+        if ($this->conn->query($sql) === true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function deleteCompletedTask() {
+        $sql = "DELETE FROM task WHERE status='1'";
+
+        if ($this->conn->query($sql) === true) {
+            return true;
+        }
+
+        return false;
     }
 
     /*

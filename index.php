@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title></title>
+    <title>Todo!</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -51,6 +51,7 @@
 
 <script src="assets/js/vendor/jquery-1.11.3.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/noty/jquery.noty.packaged.min.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
