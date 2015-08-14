@@ -1,5 +1,29 @@
 var base_apiURL = "api/view/";
 
+function notify(text, type) {
+    var n = noty({
+        text        : text,
+        type        : type,
+        dismissQueue: true,
+        closeWith   : ['click', 'backdrop', 'hover', 'button'],
+        modal       : false,
+        layout      : 'topLeft',
+        theme       : 'relax',
+        maxVisible  : 10,
+        timeout: 5000,
+        animation: {
+            open: 'animated bounceInLeft', // Animate.css class names
+            close: 'animated bounceOutLeft', // Animate.css class names
+            easing: 'swing', // unavailable - no need
+            speed: 500 // unavailable - no need
+        }
+    });
+}
+
+function somethingWWrong() {
+    notify("<i class='fa fa-exclamation'></i> Some thing went wrong", 'warning');
+}
+
 $(document).ready(function () {
     // Get list task
     $.ajax({
@@ -15,7 +39,7 @@ $(document).ready(function () {
             }
         },
         error: function () {
-            alert("Something went wrong!");
+            somethingWWrong();
         }
     });
 
@@ -80,12 +104,12 @@ $(document).ready(function () {
                             newTodo.val("");
                             newTodo.focus();
                         } else {
-                            alert("False!");
+                            notify("<i class='fa fa-times'></i> Add task failed!", 'error');
                         }
 
                     },
                     error: function () {
-                        alert("Something went wrong!");
+                        somethingWWrong();
                     }
                 });
 			}
@@ -128,7 +152,7 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                alert("Something went wrong!");
+                somethingWWrong();
             }
         });
     });
@@ -143,13 +167,14 @@ $(document).ready(function () {
             success: function (data) {
                 if (data == "1") {
                     console.log("Delete completed task success!");
+                    notify("<i class='fa fa-check'></i> Delete completed task success!", 'success');
                     delelteCompletedTask();
                 } else {
-                    alert("Delete completed task failed!");
+                    notify("<i class='fa fa-check'></i> Delete completed task failed!", 'error');
                 }
             },
             error: function () {
-                alert("Something went wrong!");
+                somethingWWrong();
             }
         });
     });
@@ -166,6 +191,15 @@ function delelteCompletedTask() {
 }
 
 function checkCompleteAll(action) {
+    var noty = '';
+    if (action != 0) {
+        noty += 'Check';
+    } else {
+        noty += 'Uncheck';
+    }
+
+    noty += ' complete all task ';
+
     $.ajax({
         url: base_apiURL + "checkCompleteAll.php",
         method: "GET",
@@ -173,13 +207,13 @@ function checkCompleteAll(action) {
         data: {action: action},
         success: function (data) {
             if (data == '1') {
-                console.log("Check/Uncheck complete all success!");
+                notify("<i class='fa fa-check'></i> " + noty + 'success!', 'success');
             } else {
-                console.log("Check/Uncheck complete all failed!");
+                notify("<i class='fa fa-times'></i> " + noty + 'failed!', 'error');
             }
         },
         error: function () {
-            alert("Something went wrong!");
+            somethingWWrong();
         }
     });
 }
@@ -208,11 +242,11 @@ function toggleCompleteTask(liTask) {
             if (data == "1") {
                 console.log("Update success!");
             } else {
-                alert("Update failed!");
+                notify("<i class='fa fa-times'></i> Update failed", 'error');
             }
         },
         error: function () {
-            alert("Something went wrong!");
+            somethingWWrong();
         }
 
     });
@@ -322,22 +356,6 @@ function showCompleteTask() {
             $(this).show();
         } else {
             $(this).hide();
-        }
-    });
-}
-
-function notify() {
-    var n = noty({
-        text: 'NOTY - a jquery notification library!',
-        type: 'info',
-        theme: 'defaultTheme',
-        lyout: 'topLeft',
-        maxVisible: 5,
-        animation: {
-            open: 'animated bounceInLeft', // Animate.css class names
-            close: 'animated bounceOutLeft', // Animate.css class names
-            easing: 'swing', // unavailable - no need
-            speed: 500 // unavailable - no need
         }
     });
 }

@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <!-- Place favicon.ico in the root directory -->
+    <link rel="shortcut icon" href="assets/img/favicon.ico">
 
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
